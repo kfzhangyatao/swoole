@@ -15,24 +15,16 @@ class Login
         // todo
         // 生成随机数
         $code = rand(10000, 99999);
-        // try{
-        //     $response = Sms::sendSms($phoneNum, $code);
-        // }
-        // catch(\Exception $e){
-        //     return Util::show(config('code.error'), '发送短信失败');
-        // }
+        $taskData = [
+            'method' => 'sendSms',
+            'data' => [
+                'phone_num' => $phoneNum,
+                'code' => $code,
+            ],
+        ];
+        $_POST['http_server']->task($taskData);
 
-        // 存redis
-        $response['code'] = 'OK';
-        if ($response['code'] === 'OK') {
-            // redis
-            $redis = new \Swoole\Coroutine\Redis();
-            $redis->connect(config('myconfig.redis.host'), config('myconfig.redis.port'));
-            $redis->set(Redis::smsKey($phoneNum), $code, config('myconfig.redis.out_time'));
-            return Util::show(config('code.success'), '发送验证码成功');
-        }else {
-            return Util::show(config('code.error'), '发送短信失败');
-        }
+       return Util::show(config('code.success'), 'sss');
     }
 
     public function login(){

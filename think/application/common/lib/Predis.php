@@ -26,7 +26,7 @@ class Predis
      */
     private function __construct(){
         $this->redis = new \Redis();
-        $result = $this->redis->connect(config('myconfig.redis.host'), config('myconfig.redis.port'), config('myconfig.redis.timeOut'));
+        $result = $this->redis->connect('127.0.0.1', 6379, 120);
         if ($result === false) {
             throw new \Exception("Redis connect error");
         }

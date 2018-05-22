@@ -4,7 +4,7 @@
  */
 class Http{
     CONST HOST = "0.0.0.0";
-    CONST PORT = 9501;
+    CONST PORT = 9502;
     public $server;
 
     public function __construct(){
@@ -13,6 +13,7 @@ class Http{
             'document_root' => '/var/www/swoole/think/public/static/live',
             'enable_static_handler' => true,
             'worker_num' => 4,
+            'task_worker_num' => 20,
         ]);
 
         $this->server->on('workerStart', [$this, 'onWorkerStart']);
@@ -63,6 +64,7 @@ class Http{
                 $_COOKIE[$k] = $val;
             }
         }
+        $_POST['http_server'] = $this->server;
         //$response->end("<h1>Hello Swoole. #" . rand(1000, 9999)."</h1>");
         // 执行应用并响应
         ob_start();
@@ -76,8 +78,19 @@ class Http{
         $response->end($ret);
     }
 
-    public function onTask(swoole_server $serv, int $task_id, int $src_worker_id, mixed $data){
-        //
+    public function onTask($serv, $task_id, $src_worker_id, $data){
+        // task 任务分发，让不同得任务走不同得逻辑
+        $obj = new app\common\lib\task\Task;
+        $method = $data['method'];
+        if (empty($method) || empty($data['data'])) {
+            return false;
+        }
+        $flag = $obj->$method($data);
+        if ($flag) {
+            echo 'finish-'.PHP_EOL;
+        }else{
+            echo 'failed-'.PHP_EOL;
+        }
     }
 
     public function onFinish(){

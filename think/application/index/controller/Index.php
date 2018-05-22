@@ -2,6 +2,7 @@
 namespace app\index\controller;
 use app\common\lib\ali\Sms;
 use think\facade\Config as MyConfig;
+use app\common\lib\Predis;
 class Index
 {
     public function index()
@@ -11,6 +12,8 @@ class Index
         //echo ENV::get('APP_PATH').'../extend/ali/vendor/autoload.php';
         print_r(MyConfig::get('myconfig.aliSms.signName'));
         //echo config('myconfig.aliSms.signName').'dd';
+        $val = rand(100, 999);
+        $redis = Predis::getInstance()->set('tao', $val, 200);
     }
 
     public function hello($name = 'ThinkPHP5')

@@ -2,7 +2,7 @@
 namespace app\common\lib\ali;
 
 use think\facade\Config as MyConfig;
-use think\Facade\Env;
+use think\facade\Env;
 
 ini_set("display_errors", "on");
 
