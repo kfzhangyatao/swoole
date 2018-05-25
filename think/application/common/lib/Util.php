@@ -18,7 +18,7 @@ class Util
      */
     public static function show($code = 0, $message = '', $data = []){
         $data = [
-            'status'=>0,
+            'status'=>$code,
             'message'=>$message,
             'data'=>$data
         ];

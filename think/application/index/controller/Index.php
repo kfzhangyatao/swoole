@@ -13,7 +13,9 @@ class Index
         print_r(MyConfig::get('myconfig.aliSms.signName'));
         //echo config('myconfig.aliSms.signName').'dd';
         $val = rand(100, 999);
-        $redis = Predis::getInstance()->set('tao', $val, 200);
+        //$redis = Predis::getInstance()->set('tao', $val, 200);
+        echo config('myconfig.redis.host');
+        //echo to_guid_string('sss');
     }
 
     public function hello($name = 'ThinkPHP5')

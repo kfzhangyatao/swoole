@@ -25,7 +25,7 @@ class Task{
         $response['code'] = 'OK';
         if ($response['code'] === 'OK') {
             // redis
-            $ret = Predis::getInstance()->set(Redis::smsKey($data['data']['phone_num']), $data['data']['code'], 5);
+            $ret = Predis::getInstance()->set(Redis::smsKey($data['data']['phone_num']), $data['data']['code'], 120);
 
             return $ret;
         }

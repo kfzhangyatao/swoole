@@ -24,7 +24,7 @@ class Login
         ];
         $_POST['http_server']->task($taskData);
 
-       return Util::show(config('code.success'), 'sss');
+        return Util::show(config('code.success'), 'sss');
     }
 
     public function login(){
@@ -49,9 +49,39 @@ class Login
                 'time' => time(),
                 'isLogin' => true,
             ];
-            Predis::getInstance()->set(Redis::userKey($phoneNum), $data);
-            return Util::show(config('code.success'), 'login is success', $data);
+            $token = $this->to_guid_string($data);
+            Predis::getInstance()->set($token, $data);
+            return Util::show(config('code.success'), 'login is success', $token);
         }
         return Util::show(config('code.error'), 'code is error');
+    }
+
+    public function isLogin(){
+        $token = $_GET['token'];
+        if (empty($token)) {
+            return Util::show(config('code.error'), 'token is empty');
+        }
+        $data = Predis::getInstance()->get($token);
+        $data = json_decode($data, true);
+        if ($data['isLogin']) {
+            return Util::show(config('code.success'), 'is login');
+        }
+        return Util::show(config('code.error'), 'is not login');
+    }
+
+    /**
+     * 根据PHP各种类型变量生成唯一标识号
+     * @param mixed $mix 变量
+     * @return string
+     */
+    public function to_guid_string($mix) {
+        if (is_object($mix)) {
+            return spl_object_hash($mix);
+        } elseif (is_resource($mix)) {
+            $mix = get_resource_type($mix) . strval($mix);
+        } else {
+            $mix = serialize($mix);
+        }
+        return md5($mix);
     }
 }

@@ -45,7 +45,7 @@ class Predis
             return '';
         }
         if (is_array($value)) {
-            $value = \think\response\Json($value);
+            $value = json_encode($value);
         }
         if (!$time) {
             return $this->redis->set($key, $value);
