@@ -14,7 +14,7 @@ class Task{
      * @param [type] $data
      * @return void
      */
-    public function sendSms($data){
+    public function sendSms($data, $serv){
         // try{
         //     $response = Sms::sendSms($data['data']['phone_num'], $data['data']['code']);
         // }
@@ -31,5 +31,35 @@ class Task{
         }
 
         return false;
+    }
+
+    /**
+     * 异步推送 直播消息
+     *
+     * @param [type] $data
+     * @param [type] $serv
+     * @return void
+     */
+    public function pushLive($data, $serv){
+        $clients = Predis::getInstance()->sMembers('live_game_key');
+        foreach ($clients as $fd) {
+            $serv->push($fd, json_encode($data['data']));
+        }
+        return true;
+    }
+
+    /**
+     * 异步推送聊天室
+     *
+     * @param [type] $data
+     * @param [type] $serv
+     * @return void
+     */
+    public function pushChart($data, $serv){
+        $clients = $serv->ports[1]->connections;
+        foreach ($clients as $fd) {
+            $serv->push($fd, json_encode($data['data']));
+        }
+        return true;
     }
 }
