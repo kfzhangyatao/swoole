@@ -20,6 +20,7 @@ class Ws{
         ]);
 
         $this->server->on('open', [$this, 'onOpen']);
+        $this->server->on('start', [$this, 'onStart']);
         $this->server->on('message', [$this, 'onMessage']);
         $this->server->on('workerStart', [$this, 'onWorkerStart']);
         $this->server->on('request', [$this, 'onRequest']);
@@ -29,14 +30,19 @@ class Ws{
 
         $this->server->start();
     }
-        /**
+
+    public function onStart(){
+        swoole_set_process_name("live_master");
+    }
+
+    /**
      * 监听ws连接事件
      * @param $ws
      * @param $request
      */
     public function onOpen($ws, $request) {
         //$ws->push($request->fd, 'success');
-        \app\common\lib\Predis::getInstance()->sAdd('live_game_key', $request->fd);
+        //\app\common\lib\Predis::getInstance()->sAdd('live_game_key', $request->fd);
         echo 'open';
     }
 
@@ -51,11 +57,17 @@ class Ws{
 
     public function onWorkerStart($server, $worker_id){
         // 加载基础文件
-        require __DIR__ . '/../thinkphp/base.php';
-        \app\common\lib\Predis::getInstance()->del('live_game_key');
+        require __DIR__ . '/../../../thinkphp/base.php';
+        //\app\common\lib\Predis::getInstance()->del('live_game_key');
     }
 
     public function onRequest($request, $response){
+        if ($request->server['request_uri'] == '/favicon.ico') {
+            $response->status(404);
+            $response->end();
+            return ;
+            # code...
+        }
         // todo , 收到请求对象，get、post、cookie、header、files、server等
         // if (!empty($_SERVER)) {
         //     unset($_SERVER);54
@@ -97,6 +109,9 @@ class Ws{
                 $_COOKIE[$k] = $val;
             }
         }
+
+        //$this->writeLog();
+
         $_POST['http_server'] = $this->server;
         //$response->end("<h1>Hello Swoole. #" . rand(1000, 9999)."</h1>");
         // 执行应用并响应
@@ -132,13 +147,32 @@ class Ws{
     }
 
     public function onClose($server, $fd, $reactorId){
-        \app\common\lib\Predis::getInstance()->sRem('live_game_key', $fd);
+        //\app\common\lib\Predis::getInstance()->sRem('live_game_key', $fd);
         echo $fd;
     }
 
     public function onShutdown($server){
-        \app\common\lib\Predis::getInstance()->del('live_game_key');
+        //\app\common\lib\Predis::getInstance()->del('live_game_key');
         echo 'del ok';
+    }
+
+    public function writeLog(){
+        $datas = array_merge(['date'=>date("Ymd H:i:s")], isset($_GET) ? $_GET : [], isset($_POST) ? $_POST : [], isset($_SERVER) ? $_SERVER : []);
+
+        $logs = "";
+        //print_r($datas);
+        foreach ($datas as $key => $value) {
+            if (is_array($value)) {
+                $value = json_encode($value);
+            }
+            $logs .= $key.":".$value." ";
+            var_dump($value);
+        }
+
+        echo $logs;
+        //swoole_async_writefile(APP_PATH.'../runtime/log/'.date("Ym")."/".date("d")."_access.log", $logs.PHP_EOL, function($filename){
+            // todo
+        //}, FILE_APPEND);
     }
 }
 
