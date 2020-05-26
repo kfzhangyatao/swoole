@@ -2,10 +2,10 @@
 return [
     // ali 短信发送配置
     'aliSms' => [
-        'signName' => 'taotao-test',
-        'templateCode' => 'SMS_134600001',
-        'accessKeyId' => 'LTAIf2VRIqrif1ll',
-        'accessKeySecret' => '5689TiXkKJ29bPL3dfMoLpYwZPFRX7'
+        'signName' => '',
+        'templateCode' => '',
+        'accessKeyId' => '',
+        'accessKeySecret' => ''
     ],
     'redis' => [
         'host' => '127.0.0.1',
